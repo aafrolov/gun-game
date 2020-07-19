@@ -1,5 +1,5 @@
 class Ball:
-    def __init__(self, ball_id, x, y, r, x_speed, y_speed, color="red"):
+    def __init__(self, ball_id, x, y, r, x_speed, y_speed, color):
         self.id = ball_id
         self.x = x
         self.y = y

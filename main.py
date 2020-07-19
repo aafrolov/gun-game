@@ -1,29 +1,47 @@
-from tkinter import *
+import tkinter as tk
 from ball import Ball
+from random import randint, choice
+
+CANVAS_WIDTH = 1000
+CANVAS_HEIGHT = 800
+BALL_MIN_RADIUS = 5
+BALL_MAX_RADIUS = 30
 
 
-def create_ball():
-    x = 10
-    y = 10
-    r = 5
-    ball_id = c.create_oval(x - r, y - r, x + r, y + r)
+class Game_Canvas(tk.Canvas):
+    def __init__(self, tk_root, width, height, bg):
+        self.balls = []
+        super().__init__(tk_root, width=width, height=height, bg=bg)
 
-    return Ball(ball_id, x, y, r, 1, 1)
+    def add_ball(self, x, y, r, speed_x, speed_y, color):
+        ball_id = self.create_oval(x - r, y - r, x + r, y + r, fill=color)
+        self.balls.append(Ball(ball_id, x, y, r, speed_x, speed_y, color))
+
+    def move_balls(self):
+        for ball in self.balls:
+            if ball.x - ball.r < 0 or ball.x + ball.r > self.winfo_width():
+                ball.x_speed = -ball.x_speed
+            if ball.y - ball.r < 0 or ball.y + ball.r > self.winfo_height():
+                ball.y_speed = -ball.y_speed
+
+            self.move(ball.id, ball.x_speed, ball.y_speed)
+            ball.x += ball.x_speed
+            ball.y += ball.y_speed
+
+    def motion(self):
+        self.move_balls()
+        self._root().after(10, self.motion)
 
 
-root = Tk()
-c = Canvas(root, width=200, height=200, bg='white')
+root = tk.Tk()
+c = Game_Canvas(root, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg='black')
 c.focus_set()
 c.pack()
 
-b1 = create_ball()
+for i in range(1000):
+    c.add_ball(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, randint(BALL_MIN_RADIUS, BALL_MAX_RADIUS + 1),
+               randint(-5, 5), randint(-5, 5), choice(['white', 'red', 'green', 'blue', 'cyan', 'yellow', 'magenta']))
 
 
-def motion():
-    c.move(b1.id, b1.x_speed, b1.y_speed)
-    root.after(10, motion)
-
-
-motion()
-
+c.motion()
 root.mainloop()
